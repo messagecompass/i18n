@@ -35,11 +35,17 @@ namespace i18n
                     return result;
                 }
 
+                //NOTE: disabled this as in any case cultures derivant from en are ignored,
+                // it could be ok to use the key if the language is just en, but with this code
+                // en-US en-AU en-CA are all ignored tho obviousely they could be different from 
+                // the default en variable
+                // next to that "en" cannot be translated using PO files which could be useful
                 // Save cycles processing beyond the default; this one is guaranteed
+                /*
                 if (culture.TwoLetterISOLanguageName.Equals(I18N.DefaultTwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
                 {
                     return I18N.DefaultTwoLetterISOLanguageName;
-                }
+                }*/
 
                 // Don't process the same culture code again
                 if (culture.IetfLanguageTag.Equals(culture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
@@ -100,11 +106,17 @@ namespace i18n
                 // en-US
                 var regional = TryGetTextFor(culture.IetfLanguageTag, key);
 
+                //NOTE: disabled this as in any case cultures derivant from en are ignored,
+                // it could be ok to use the key if the language is just en, but with this code
+                // en-US en-AU en-CA are all ignored tho obviousely they could be different from 
+                // the default en variable
+                // next to that "en" cannot be translated using PO files which could be useful
                 // Save cycles processing beyond the default; just return the original key
+                /*
                 if (culture.TwoLetterISOLanguageName.Equals(I18N.DefaultTwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
                 {
                     return key;
-                }
+                }*/
 
                 // en (and regional was defined)
                 if(!culture.IetfLanguageTag.Equals(culture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase) && regional == key)
@@ -283,7 +295,7 @@ namespace i18n
         {
             lock (_sync)
             {
-                var messages = (List<I18NMessage>) HttpRuntime.Cache[string.Format("po:{0}", culture)];
+                var messages = ((List<I18NMessage>) HttpRuntime.Cache[string.Format("po:{0}", culture)]).Where(m => m.MsgId != null);
 
                 if (messages.Count() == 0)
                 {

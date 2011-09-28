@@ -28,7 +28,15 @@ namespace i18n
 
         private static void MergeTemplateWithExistingLocales(string path)
         {
-            var locales = Directory.GetDirectories(string.Format("{0}\\locale\\", path));
+            string localePath = string.Format("{0}\\locale\\", path);
+
+            if (false == Directory.Exists(localePath))
+            {
+                Directory.CreateDirectory(localePath);    
+            }
+
+            var locales = Directory.GetDirectories(localePath);
+
             var template = string.Format("{0}\\locale\\messages.pot", path);
 
             foreach (var messages in locales.Select(locale => string.Format("{0}\\messages.po", locale)))
@@ -81,7 +89,8 @@ namespace i18n
         {
             var cs = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories);
             var razor = Directory.GetFiles(path, "*.cshtml", SearchOption.AllDirectories);
-            var files = (new[] {cs, razor}).SelectMany(f => f).ToList();
+            var objPath = Path.Combine(path, "obj").ToLower();
+            var files = (new[] {cs, razor}).SelectMany(f => f).Where(f=>!f.ToLower().StartsWith(objPath)).ToList();
             var temp = Path.GetTempFileName();
             using(var sw = File.CreateText(temp))
             {
